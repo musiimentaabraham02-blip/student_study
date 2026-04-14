@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 210 50% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 50% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 50% 10%;
+
+    --primary: 205 70% 30%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 180 30% 90%;
+    --secondary-foreground: 205 70% 20%;
+
+    --muted: 210 20% 94%;
+    --muted-foreground: 210 15% 45%;
+
+    --accent: 174 50% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 205 70% 30%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 210 50% 10%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 174 50% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 16%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 210 40% 16%;
+    --sidebar-ring: 174 50% 50%;
+
+    --chart-1: 205 70% 30%;
+    --chart-2: 174 50% 42%;
+    --chart-3: 195 60% 50%;
+    --chart-4: 210 30% 60%;
+    --chart-5: 180 40% 70%;
+
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  .dark {
+    --background: 210 50% 6%;
+    --foreground: 210 20% 94%;
+
+    --card: 210 50% 10%;
+    --card-foreground: 210 20% 94%;
+
+    --popover: 210 50% 10%;
+    --popover-foreground: 210 20% 94%;
+
+    --primary: 174 50% 50%;
+    --primary-foreground: 210 50% 6%;
+
+    --secondary: 210 40% 16%;
+    --secondary-foreground: 210 20% 94%;
+
+    --muted: 210 40% 14%;
+    --muted-foreground: 210 15% 55%;
+
+    --accent: 174 50% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 210 40% 16%;
+    --input: 210 40% 16%;
+    --ring: 174 50% 50%;
+
+    --sidebar-background: 210 50% 6%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 174 50% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 12%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 210 40% 12%;
+    --sidebar-ring: 174 50% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
