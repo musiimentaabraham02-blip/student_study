@@ -2,20 +2,86 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, CalendarDays, BookOpen, ArrowRight, Clock, MapPin } from "lucide-react";
-import { studyGroups, studySessions, currentUser } from "@/lib/mock-data";
+import { Users, CalendarDays, BookOpen, ArrowRight, Clock, MapPin, LayoutDashboard } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { getGroups, getSessions } from "@/lib/storage";
 
-const myGroups = studyGroups.slice(0, 3);
-const upcomingSessions = studySessions.slice(0, 3);
-const recentGroups = studyGroups.slice(3, 6);
+// Data will be fetched inside the component
 
 const Dashboard = () => {
+  const { user, isAdmin } = useAuth();
+  const allGroups = getGroups();
+  const allSessions = getSessions();
+
+  const myGroups = allGroups.filter(g => g.leaderId === user?.id).slice(0, 3);
+  const upcomingSessions = allSessions.slice(0, 3);
+  const recentGroups = allGroups.slice(0, 3);
+
+  if (isAdmin) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold font-[family-name:var(--font-heading)]">Admin Command Center</h1>
+            <p className="text-muted-foreground mt-1">Platform-wide overview and analytics.</p>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/admin" className="gap-2"><LayoutDashboard className="h-4 w-4" /> Management Console</Link>
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          {[
+            { icon: Users, label: "Total Users", value: "245", color: "text-blue-500" },
+            { icon: Users, label: "Active Groups", value: allGroups.length, color: "text-primary" },
+            { icon: CalendarDays, label: "Total Sessions", value: allSessions.length, color: "text-accent" },
+            { icon: BookOpen, label: "Course Modules", value: "12", color: "text-green-500" },
+          ].map((stat) => (
+            <Card key={stat.label}>
+              <CardContent className="p-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted mb-4">
+                  <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                </div>
+                <p className="text-2xl font-bold font-[family-name:var(--font-heading)]">{stat.value}</p>
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Recent Platform Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+               {allGroups.slice(0, 5).map(g => (
+                 <div key={g.id} className="flex items-center justify-between p-3 border rounded-lg">
+                   <div className="flex items-center gap-3">
+                     <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center">
+                        <Users className="h-4 w-4 text-primary" />
+                     </div>
+                     <div>
+                       <p className="text-sm font-semibold">{g.name}</p>
+                       <p className="text-xs text-muted-foreground">New group created by {g.leaderName}</p>
+                     </div>
+                   </div>
+                   <Badge variant="secondary" className="text-[10px]">{g.createdAt}</Badge>
+                 </div>
+               ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Welcome */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold font-[family-name:var(--font-heading)]">
-          Welcome back, {currentUser.name.split(' ')[0]}! 👋
+          Welcome back, {user?.name.split(' ')[0] || 'Student'}! 👋
         </h1>
         <p className="text-muted-foreground mt-1">
           Here's what's happening with your study groups.

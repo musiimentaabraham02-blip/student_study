@@ -9,17 +9,36 @@ import {
   Users, MapPin, CalendarDays, Clock, MessageSquare,
   UserPlus, ArrowLeft, Crown, Megaphone, HelpCircle
 } from "lucide-react";
-import { studyGroups, studySessions, groupPosts } from "@/lib/mock-data";
-import { useState } from "react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { getGroups, getSessions, getPosts, savePost, saveSession } from "@/lib/storage";
+import { StudySession, GroupPost } from "@/lib/mock-data";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 const GroupDetail = () => {
   const { id } = useParams();
+  const { user } = useAuth();
+  const studyGroups = getGroups();
   const group = studyGroups.find((g) => g.id === id);
-  const sessions = studySessions.filter((s) => s.groupId === id);
-  const posts = groupPosts.filter((p) => p.groupId === id);
+  
+  const [sessions, setSessions] = useState<StudySession[]>(getSessions(id || ""));
+  const [posts, setPosts] = useState<GroupPost[]>(getPosts(id || ""));
+  
   const [newPost, setNewPost] = useState("");
-  const [joined, setJoined] = useState(id === "g1");
+  const [isJoined, setIsJoined] = useState(false); // In real app, check if user is in member list
+  const [isScheduling, setIsScheduling] = useState(false);
+  
+  const isLeader = group?.leaderId === user?.id;
+
+  const [sessionForm, setSessionForm] = useState({
+    date: "",
+    time: "",
+    location: "",
+    description: "",
+  });
 
   if (!group) {
     return (
@@ -57,12 +76,81 @@ const GroupDetail = () => {
             ))}
           </div>
         </div>
-        {!joined ? (
-          <Button className="gap-2" onClick={() => { setJoined(true); toast.success("Joined group!"); }}>
+        {!isJoined && !isLeader ? (
+          <Button className="gap-2" onClick={() => { setIsJoined(true); toast.success("Joined group!"); }}>
             <UserPlus className="h-4 w-4" /> Join Group
           </Button>
         ) : (
-          <Badge className="bg-accent text-accent-foreground px-3 py-1.5">✓ Member</Badge>
+          <div className="flex gap-2">
+            {isLeader && (
+              <Dialog open={isScheduling} onOpenChange={setIsScheduling}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="gap-2 border-primary text-primary">
+                    <CalendarDays className="h-4 w-4" /> Schedule Session
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Schedule New Study Session</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Input 
+                        placeholder="e.g. Chapter 4 Review" 
+                        value={sessionForm.description}
+                        onChange={e => setSessionForm({...sessionForm, description: e.target.value})}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Date</Label>
+                        <Input 
+                          type="date" 
+                          value={sessionForm.date}
+                          onChange={e => setSessionForm({...sessionForm, date: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Time</Label>
+                        <Input 
+                          type="time" 
+                          value={sessionForm.time}
+                          onChange={e => setSessionForm({...sessionForm, time: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Location</Label>
+                      <Input 
+                        placeholder="Room number or link" 
+                        value={sessionForm.location}
+                        onChange={e => setSessionForm({...sessionForm, location: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button onClick={() => {
+                       const session: StudySession = {
+                         id: Math.random().toString(36).substr(2, 9),
+                         groupId: id || "",
+                         groupName: group?.name || "",
+                         ...sessionForm,
+                         attendees: 1
+                       };
+                       saveSession(session);
+                       setSessions(getSessions(id));
+                       setIsScheduling(false);
+                       toast.success("Session scheduled!");
+                    }}>Save Session</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+            <Badge className="bg-accent text-accent-foreground px-3 py-1.5 h-10 flex items-center">
+              {isLeader ? "👑 Leader" : "✓ Member"}
+            </Badge>
+          </div>
         )}
       </div>
 
@@ -144,7 +232,7 @@ const GroupDetail = () => {
         </TabsContent>
 
         <TabsContent value="discussion" className="mt-4 space-y-4">
-          {joined && (
+          {(isJoined || isLeader) && (
             <Card>
               <CardContent className="p-4 space-y-3">
                 <Textarea
@@ -156,9 +244,19 @@ const GroupDetail = () => {
                 <Button
                   size="sm"
                   onClick={() => {
-                    if (newPost.trim()) {
-                      toast.success("Post shared!");
+                    if (newPost.trim() && id) {
+                      const post: GroupPost = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        groupId: id,
+                        authorName: user?.name || "Anonymous",
+                        content: newPost,
+                        createdAt: new Date().toISOString(),
+                        type: isLeader ? 'announcement' : 'general'
+                      };
+                      savePost(post);
+                      setPosts(getPosts(id));
                       setNewPost("");
+                      toast.success("Post shared!");
                     }
                   }}
                 >

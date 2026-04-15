@@ -11,7 +11,7 @@ export function DashboardLayout() {
           <header className="h-14 flex items-center border-b bg-card px-4 gap-4">
             <SidebarTrigger />
             <h1 className="text-lg font-semibold font-[family-name:var(--font-heading)] text-foreground">
-              Student Study Group Finder
+              STUDENT STUDY GROUP
             </h1>
           </header>
           <main className="flex-1 overflow-auto p-4 md:p-6">

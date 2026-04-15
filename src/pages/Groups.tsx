@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Users, MapPin, PlusCircle } from "lucide-react";
-import { studyGroups } from "@/lib/mock-data";
+import { getGroups } from "@/lib/storage";
 
 const Groups = () => {
   const [search, setSearch] = useState("");
   const [faculty, setFaculty] = useState("all");
+  const studyGroups = getGroups();
 
   const filtered = studyGroups.filter((g) => {
     const matchesSearch =

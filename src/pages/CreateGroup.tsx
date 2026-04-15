@@ -7,9 +7,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { saveGroup } from "@/lib/storage";
+import { StudyGroup } from "@/lib/mock-data";
 
 const CreateGroup = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form, setForm] = useState({
     name: "",
     courseCode: "",
@@ -28,8 +32,26 @@ const CreateGroup = () => {
       toast.error("Please fill in all required fields");
       return;
     }
+
+    const newGroup: StudyGroup = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: form.name,
+      courseCode: form.courseCode,
+      courseName: form.courseName,
+      description: form.description,
+      meetingLocation: form.meetingLocation,
+      faculty: form.faculty,
+      leaderId: user?.id || "u1",
+      leaderName: user?.name || "System",
+      memberCount: 1,
+      maxMembers: parseInt(form.maxMembers),
+      createdAt: new Date().toISOString().split('T')[0],
+      tags: [form.courseCode.split(' ')[0]],
+    };
+
+    saveGroup(newGroup);
     toast.success("Study group created successfully!");
-    navigate("/my-groups");
+    navigate("/groups");
   };
 
   return (
