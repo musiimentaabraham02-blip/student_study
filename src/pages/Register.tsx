@@ -28,8 +28,8 @@ const Register = () => {
     }
     
     try {
-      // Simulate registration then auto-login
-      await login(formData.email, "student");
+      // Simulate registration then auto-login with name
+      await login(formData.email, formData.name);
       toast.success("Account created successfully!");
       navigate("/dashboard");
     } catch (error) {

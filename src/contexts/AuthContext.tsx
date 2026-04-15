@@ -3,7 +3,7 @@ import { User } from '@/lib/mock-data';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, role: User['role']) => Promise<void>;
+  login: (email: string, name?: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -21,19 +21,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, role: User['role']) => {
+  const login = async (email: string, name?: string) => {
     // Simulate JWT/API delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // In a real app, we'd fetch the user from a database
-    // For this simulation, we'll create a user object
+    // Strict Admin Role Checking
+    const adminEmail = "musiimentaabraham02@gmail.com";
+    const role: User['role'] = email.toLowerCase() === adminEmail.toLowerCase() ? "admin" : "student";
+    
+    // Resolve name: Use provided name, or format from email, or special admin name
+    let displayName = name || email.split('@')[0];
+    if (email.toLowerCase() === adminEmail.toLowerCase()) {
+      displayName = "Abraham Musiimenta"; // Official Admin Identity
+    }
+
     const mockUser: User = {
       id: Math.random().toString(36).substr(2, 9),
-      name: email.split('@')[0],
+      name: displayName,
       email: email,
       role: role,
-      program: 'Information Technology',
-      yearOfStudy: 2,
+      program: role === 'admin' ? 'System Administrator' : 'Information Technology',
+      yearOfStudy: role === 'admin' ? 0 : 2,
     };
 
     localStorage.setItem('study_finder_user', JSON.stringify(mockUser));

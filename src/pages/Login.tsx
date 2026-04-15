@@ -18,9 +18,8 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // In this redesign, we handle admin/student detection
-      const role = email.includes("admin") ? "admin" : "student";
-      await login(email, role);
+      // Role detection is now handled strictly in AuthContext based on email
+      await login(email);
       toast.success("Welcome back!");
       navigate("/dashboard");
     } catch (error) {
