@@ -105,6 +105,10 @@ create policy "Users can post to groups they are in." on group_posts for insert 
 
 -- ## 6. AUTOMATIC PROFILE CREATION TRIGGER
 -- This automatically creates a profile when a user signs up via Supabase Auth.
+
+-- First, remove the trigger if it already exists to avoid errors
+drop trigger if exists on_auth_user_created on auth.users;
+
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
