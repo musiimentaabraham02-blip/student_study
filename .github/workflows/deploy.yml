@@ -40,6 +40,9 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
+        env:
+          VITE_SUPABASE_URL: https://ovqfivczyafwsxbchjbk.supabase.co
+          VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im92cWZpdmN6eWFmd3N4YmNoamJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxNzIxOTIsImV4cCI6MjA5MTc0ODE5Mn0.TVvaQQktl3zIuPcaaUhTlShwyb5M-psW-C2oGBjubN8
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact
